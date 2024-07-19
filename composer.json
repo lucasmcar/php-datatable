@@ -1,0 +1,19 @@
+{
+    "name": "php_data_table/php_data_table",
+    "type": "library",
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "PhpDataTable\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "lucasmcar",
+            "email": "lmc.lucas90@gmail.com"
+        }
+    ],
+    "require": {}
+}
