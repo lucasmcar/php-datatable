@@ -4,7 +4,7 @@
  * This a file test to build a datatable
  */
 
-use PhpDataTable\Builder\DataTableBuilder;
+use PhpDataTable\Builder\DataTable;
 
 require 'vendor/autoload.php';
 
@@ -29,13 +29,14 @@ $result = [
 
 ];
 
-$table = new DataTableBuilder();
-$table->tableCSS("https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css");
-$table->setAttrs(['class' => 'table']);
-$table->setHeaders(['id', 'nome', 'senha']);
-$table->addRows($result);
+$table = new DataTable();
 
-$table->rowsPerPage(5);
-$table->currentPage($currentPage);
+//$table->tableCSS("https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css");
+$table->setAttributes(['class' => 'table']);
+$table->setHeaders(['id', 'nome', 'senha']);
+$table->rows($result);
+
+$table->pagination(true, 8);
+$table->current($currentPage);
 
 echo $table->render();
