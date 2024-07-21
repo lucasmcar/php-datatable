@@ -2,6 +2,8 @@
 
 namespace PhpDataTable\Builder;
 
+use PhpDataTable\Paginator\Paginator;
+
 class DataTable 
 {
     private $builder;
@@ -35,21 +37,15 @@ class DataTable
         return $this;
     }
 
-    public function pagination(bool $show, $pages = 1)
+    public function setCss($link)
     {
-        if($show == true)
-        {
-            $this->builder->rowsPerPage($pages);
-            return $this;
-        }
-
-       
-        return false;
+        $this->builder->tableCss($link);
+        return $this;
     }
 
-    public function current($currentPage)
+    public function setPaginator(Paginator $paginator)
     {
-        $this->builder->currentPage($currentPage);
+        return $this->builder->addPaginator($paginator);
         return $this;
     }
 

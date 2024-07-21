@@ -6,8 +6,8 @@
         "phpunit/phpunit": "^10.5"
     },
     "license": "MIT",
-    "version": "0.1.0",
-    "minimum-stability": "dev",
+    "version": "1.0.0",
+    "minimum-stability": "stable",
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
