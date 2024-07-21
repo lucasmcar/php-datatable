@@ -2,6 +2,8 @@
 
 namespace PhpDataTable\Builder;
 
+use PhpDataTable\Paginator\Paginator;
+
 class DataTableBuilder
 {
 
@@ -11,6 +13,9 @@ class DataTableBuilder
     private $rowsPerPage;
     private $currentPage;
     private $cssLink;
+    private $hasPagination;
+    private $paginator;
+
 
     public function __construct()
     {
@@ -21,12 +26,20 @@ class DataTableBuilder
         $this->currentPage = 1;
     }
 
+    /**
+     * Add one only row to the Datatable
+     * @param array $rows
+     */
     public function addRow(array $rows)
     {
         $this->rows[] = $rows;
         return $this;
     }
 
+    /**
+     * Add many rows to the Datatable
+     * @param array $rows
+     */
     public function addRows(array $rows)
     {
         foreach($rows as $row){
@@ -35,6 +48,10 @@ class DataTableBuilder
         return $this;
     }
 
+    /**
+     * Set attributes to table like classes, ids, etc
+     * @param array $attrs
+     */
     public function setAttrs(array $attrs)
     {
         $this->attrs = $attrs; 
@@ -43,7 +60,7 @@ class DataTableBuilder
 
     public function tableCss($link)
     {
-        $this->cssLink = sprintf("<head><link rel='stylesheet' href='%s'></head>", htmlspecialchars($link));
+        $this->cssLink = sprintf("<head><link rel='stylesheet' href='%s'></head>", htmlspecialchars($link, ENT_QUOTES, "UTF-8"));
         return $this;
     }
 
@@ -57,25 +74,39 @@ class DataTableBuilder
     {
         $attrStr = '';
         foreach ($this->attrs as $key => $value) {
-            $attrStr .= sprintf(' %s="%s"', $key, htmlspecialchars($value));
+            $attrStr .= sprintf(' %s="%s"', $key, htmlspecialchars($value, ENT_QUOTES, "UTF-8"));
         }
         return $attrStr;
     }
 
+    public function hasPagination(bool $hasPagination = true)
+    {
+        $this->hasPagination = $hasPagination;
+        return $this;
+    }
 
+    public function addPaginator(Paginator $paginator)
+    {
+        $this->paginator = $paginator;
+        return $this;
+    }
 
+    /**
+     * Render the table on a view
+     */
     public function render()
     {
-        $start = ($this->currentPage - 1) * $this->rowsPerPage;
-        $currentRows = array_slice($this->rows, $start, $this->rowsPerPage);
-
-        $html = $this->cssLink . '<table' . $this->renderAttributes() . '>';
+        $offset       = $this->paginator->getOffset();
+        $itemsPerPage = $this->paginator->getItemsPerPage();
+        $currentRows  = array_slice($this->rows, $offset, $itemsPerPage);
+        
+        $html = $this->cssLink. ' <table' . $this->renderAttributes() . '>';
 
         // Render headers
         if (!empty($this->headers)) {
             $html .= '<thead><tr>';
             foreach ($this->headers as $header) {
-                $html .= '<th>' . htmlspecialchars($header) . '</th>';
+                $html .= '<th>' . htmlspecialchars($header, ENT_QUOTES, "UTF-8") . '</th>';
             }
             $html .= '</tr></thead>';
         }
@@ -85,7 +116,7 @@ class DataTableBuilder
         foreach ($currentRows as $r) {
             $html .= '<tr>';
             foreach ($r as $cell) {
-                $html .= '<td>' . htmlspecialchars($cell) . '</td>';
+                $html .= '<td>' . htmlspecialchars($cell, ENT_QUOTES, "UTF-8") . '</td>';
             }
             $html .= '</tr>';
         }
@@ -94,7 +125,7 @@ class DataTableBuilder
         $html .= '</table>';
 
         // Render pagination
-        $html .= $this->showPagination();
+        $html .= $this->paginator->render();
 
         return $html;
     }
@@ -110,25 +141,4 @@ class DataTableBuilder
         $this->currentPage = $currentPage;
         return $this;
     }
-
-    private function showPagination() {
-        $totalRows = count($this->rows);
-        $totalPages = ceil($totalRows / $this->rowsPerPage);
-        $pagination = '<ul class="pagination">';
-
-        for ($i = 1; $i <= $totalPages; $i++) {
-            if ($i == $this->currentPage) {
-                $pagination .= '
-                    <li class="page-item disabled">
-                        <a class="page-link">'.$i.' </a>
-                    </li> ';
-            } else {
-                $pagination .= '<a class="page-link" href="?page=' . $i . '">' . $i . '</a> ';
-            }
-        }
-
-        $pagination .= '</ul>';
-        return $pagination;
-    }
-
 }

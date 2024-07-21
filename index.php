@@ -5,11 +5,13 @@
  */
 
 use PhpDataTable\Builder\DataTable;
+use PhpDataTable\Paginator\Paginator;
 
 require 'vendor/autoload.php';
 
 
 $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$itemsPerPage = 5;
 
 $result = [
     
@@ -29,14 +31,15 @@ $result = [
 
 ];
 
+$paginator = new Paginator(count($result), $itemsPerPage, $currentPage);
+
 $table = new DataTable();
 
 //$table->tableCSS("https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css");
-$table->setAttributes(['class' => 'table']);
-$table->setHeaders(['id', 'nome', 'senha']);
-$table->rows($result);
-
-$table->pagination(true, 8);
-$table->current($currentPage);
+$table->setAttributes(['class' => 'table'])
+    ->setCss("https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css")
+    ->setHeaders(['id', 'nome', 'senha'])
+    ->rows($result)
+    ->setPaginator($paginator);
 
 echo $table->render();
